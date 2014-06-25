@@ -3,6 +3,7 @@ package schemabuilder
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -12,17 +13,27 @@ func NewSQLite3Dialect() *SQLite3Dialect {
 	return &SQLite3Dialect{}
 }
 
+func (d *SQLite3Dialect) Quote(s string) string {
+	return fmt.Sprintf(`"%s"`, strings.Replace(s, `"`, `""`, -1))
+}
+
 func (d *SQLite3Dialect) Column() ColumnMapper {
-	return &SQLite3ColumnMapper{}
+	return &SQLite3ColumnMapper{d}
 }
 
 func (d *SQLite3Dialect) CreateTableSuffix() string {
 	return ""
 }
 
-type SQLite3ColumnMapper struct{}
+type SQLite3ColumnMapper struct {
+	Dialect *SQLite3Dialect
+}
 
-func (m *SQLite3ColumnMapper) DataType(v interface{}, size uint64) string {
+func (self *SQLite3ColumnMapper) Quote(s string) string {
+	return self.Dialect.Quote(s)
+}
+
+func (s *SQLite3ColumnMapper) DataType(v interface{}, size uint64) string {
 	switch v.(type) {
 	case bool:
 		return "boolean"

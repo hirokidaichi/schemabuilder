@@ -13,7 +13,11 @@ type MySQLDialect struct {
 }
 
 func (d *MySQLDialect) Column() ColumnMapper {
-	return &MySQLColumnMapper{}
+	return &MySQLColumnMapper{d}
+}
+
+func (d *MySQLDialect) Quote(s string) string {
+	return fmt.Sprintf("`%s`", strings.Replace(s, "`", "``", -1))
 }
 
 func (d *MySQLDialect) CreateTableSuffix() string {
@@ -31,7 +35,13 @@ func NewMySQLDialect(charset string, engine string) *MySQLDialect {
 	return &MySQLDialect{Charset: charset, Engine: engine}
 }
 
-type MySQLColumnMapper struct{}
+type MySQLColumnMapper struct {
+	Dialect *MySQLDialect
+}
+
+func (m *MySQLColumnMapper) Quote(s string) string {
+	return m.Dialect.Quote(s)
+}
 
 func (m *MySQLColumnMapper) DataType(v interface{}, size uint64) string {
 	switch v.(type) {
