@@ -115,7 +115,7 @@ func (c *Column) ToSQL() string {
 
 func (c *Column) DataType() string {
 	d := c.Table.Dialect.Column()
-	return d.DataType(c.Type, c.TypeSize)
+	return d.DataType(c.Type, c.IsAutoIncrement, c.TypeSize)
 }
 
 func (c *Column) Constraints() string {

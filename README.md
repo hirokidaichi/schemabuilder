@@ -8,7 +8,7 @@ I want not O/R Mapper but a simple DDL builder.
 
 + Get a SQL as string
 + Get a Migration SQL as string 
-+ MySQL and SQLite3 Supported
++ MySQL, SQLite3, and Postgres (beta) Supported
 + Composed index supported
 
 
@@ -25,8 +25,8 @@ import (
 )
 
 type Person struct {
-	Id        uint64 `pk:"true",autoincrement:"true"`
-	Name      string `size:"200",unique:"true"`
+	Id        uint64 `pk:"true" autoincrement:"true"`
+	Name      string `size:"200" unique:"true"`
 	Info      *string
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -47,8 +47,8 @@ func main() {
 /*
 
 CREATE TABLE IF NOT EXISTS `people`(
-    `id` BIGINT NOT NULL PRIMARY KEY,
-    `name` VARCHAR(200) NOT NULL,
+    `id` BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    `name` VARCHAR(200) NOT NULL UNIQUE,
     `info` VARCHAR(255) ,
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL
@@ -72,8 +72,8 @@ import (
 )
 
 type Person_old struct {
-	Id        uint64 `pk:"true",autoincrement:"true"`
-	Name      string `size:"200",unique:"true"`
+	Id        uint64 `pk:"true" autoincrement:"true"`
+	Name      string `size:"200" unique:"true"`
 	Info      *string
 	CreatedAt time.Time
 	UpdatedAt time.Time

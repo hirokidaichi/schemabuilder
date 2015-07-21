@@ -43,7 +43,7 @@ func (m *MySQLColumnMapper) Quote(s string) string {
 	return m.Dialect.Quote(s)
 }
 
-func (m *MySQLColumnMapper) DataType(v interface{}, size uint64) string {
+func (m *MySQLColumnMapper) DataType(v interface{}, autoIncr bool, size uint64) string {
 	switch v.(type) {
 	case bool:
 		return "BOOLEAN"
@@ -98,5 +98,5 @@ func (d *MySQLColumnMapper) varchar(size uint64) string {
 }
 
 func (m *MySQLColumnMapper) AutoIncrement() string {
-	return "AUTO_INCREAMENT"
+	return "AUTO_INCREMENT"
 }
