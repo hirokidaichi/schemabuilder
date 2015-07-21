@@ -7,7 +7,7 @@ type Dialect interface {
 }
 
 type ColumnMapper interface {
-	DataType(v interface{}, size uint64) string
+	DataType(v interface{}, autoIncr bool, size uint64) string
 	AutoIncrement() string
 	Quote(string) string
 }

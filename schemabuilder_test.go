@@ -13,8 +13,8 @@ var P = fmt.Println
 var PtrString *string
 
 type Person struct {
-	Id        uint64 `pk:"true",autoincrement:"true"`
-	Name      string `size:"200",unique:"true"`
+	Id        uint64 `pk:"true" autoincrement:"true"`
+	Name      string `size:"200" unique:"true"`
 	Info      *string
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -57,6 +57,7 @@ func replace(s, o, n string) string {
 
 var builderMySQL = For(NewMySQLDialect("utf8", "InnoDB"))
 var builderSQLite = For(NewSQLite3Dialect())
+var builderPostgres = For(NewPostgresDialect())
 
 func TestVersioning(t *testing.T) {
 	table := builderMySQL.DefineTable(TestTable{}, nil).
@@ -70,8 +71,8 @@ func TestVersioning(t *testing.T) {
 func TestEmbedStructMySQL(t *testing.T) {
 
 	expect := replace(`CREATE TABLE IF NOT EXISTS +students+(
-+id+ BIGINT NOT NULL PRIMARY KEY,
-+name+ VARCHAR(200) NOT NULL,
++id+ BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
++name+ VARCHAR(200) NOT NULL UNIQUE,
 +info+ VARCHAR(255) ,
 +created_at+ DATETIME NOT NULL,
 +updated_at+ DATETIME NOT NULL,
@@ -90,8 +91,8 @@ CREATE UNIQUE INDEX +key2+ ON +students+ (+created_at+,+updated_at+);
 func TestSample02MySQL(t *testing.T) {
 	table := builderMySQL.DefineTable(Person{}, PersonIndex{})
 	expect := replace(`CREATE TABLE IF NOT EXISTS +people+(
-+id+ BIGINT NOT NULL PRIMARY KEY,
-+name+ VARCHAR(200) NOT NULL,
++id+ BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
++name+ VARCHAR(200) NOT NULL UNIQUE,
 +info+ VARCHAR(255) ,
 +created_at+ DATETIME NOT NULL,
 +updated_at+ DATETIME NOT NULL
@@ -108,8 +109,8 @@ CREATE UNIQUE INDEX +key2+ ON +people+ (+created_at+,+updated_at+);
 func TestSample02SQLite3(t *testing.T) {
 	table := builderSQLite.DefineTable(Person{}, PersonIndex{})
 	expect := `CREATE TABLE IF NOT EXISTS "people"(
-"id" integer NOT NULL PRIMARY KEY,
-"name" text NOT NULL,
+"id" integer AUTOINCREMENT NOT NULL PRIMARY KEY,
+"name" text NOT NULL UNIQUE,
 "info" text ,
 "created_at" datetime NOT NULL,
 "updated_at" datetime NOT NULL
@@ -120,5 +121,23 @@ CREATE UNIQUE INDEX "key2" ON "people" ("created_at","updated_at");
 
 	if result := table.String(); result != expect {
 		t.Errorf("invalid create table %s", result)
+	}
+}
+
+func TestSample02Postgres(t *testing.T) {
+	table := builderPostgres.DefineTable(Person{}, PersonIndex{})
+	expect := `CREATE TABLE IF NOT EXISTS "people"(
+"id" BIGSERIAL  NOT NULL PRIMARY KEY,
+"name" VARCHAR(200) NOT NULL UNIQUE,
+"info" VARCHAR(255) ,
+"created_at" TIMESTAMP WITH TIME ZONE NOT NULL,
+"updated_at" TIMESTAMP WITH TIME ZONE NOT NULL
+);
+CREATE INDEX "key1" ON "people" ("created_at","updated_at");
+CREATE UNIQUE INDEX "key2" ON "people" ("created_at","updated_at");
+`
+
+	if result := table.String(); result != expect {
+		t.Errorf("invalid create table \n\t%s\n\t%s", result, expect)
 	}
 }

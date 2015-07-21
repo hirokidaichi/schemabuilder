@@ -33,7 +33,7 @@ func (self *SQLite3ColumnMapper) Quote(s string) string {
 	return self.Dialect.Quote(s)
 }
 
-func (s *SQLite3ColumnMapper) DataType(v interface{}, size uint64) string {
+func (s *SQLite3ColumnMapper) DataType(v interface{}, autoIncr bool, size uint64) string {
 	switch v.(type) {
 	case bool:
 		return "boolean"
@@ -60,5 +60,5 @@ func (s *SQLite3ColumnMapper) DataType(v interface{}, size uint64) string {
 }
 
 func (m *SQLite3ColumnMapper) AutoIncrement() string {
-	return "AUTOINCREAMENT"
+	return "AUTOINCREMENT"
 }
